@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+
+{% block conteudo %}
+
+  {% set mensagens = get_flashed_messages() %}
+    
+    <div class="container py-5" wi>
+    {% if not mensagens %}
+      
+      <h1 class="h2">Consulta de NFe</h1>
+      <form method='post' class="container-fluid justify-content-start">
+        <div class="form-floating">
+          <select name="chaveemissor" class="form-select form-select-md mb-3" id="floatingSelect" aria-label="Floating label select example">
+            {% for cliente in clientesIwa %}
+            <option value="{{ cliente["chaveemissor"] }}">{{ cliente["nomecliente"] }}</option>
+            {% endfor %}
+          </select>
+          <label for="floatingSelect">Cliente emissor</label>
+        </div>
+        <div class="form-floating mb-3">
+          <input type="text" name="nnf" class="form-control" id="floatingInput" placeholder="1188">
+          <label for="floatingInput">NFe nº.</label>
+        </div>
+        <div class="form-floating mb-3">
+          <input type="text" name="serie" value="3" class="form-control" id="floatingInput" placeholder="3"><br>
+          <label for="floatingInput">Série da NFe</label>
+        </div>
+        <button class="btn btn-primary" type="submit">Consultar NFe</button>
+      </form>
+    {% else %}
+      <a href="{% if dadosjson %}{{ dadosjson["DocPDFLink"] }}{% endif %}" target="_blank" class="btn btn-primary">PDF da NFe</a>
+      <a href="/usuarios/consultanf" class="btn btn-primary">Nova consulta</a>
+
+      <div class="alert alert-primary" role="alert">
+        <h4 class="alert-heading">{% if dadosjson %}{{ dadosjson["DocSitDescricao"] }}{% else %} NFe nº. {{ numeronf }}, série {{ serienf }}, não encontrada na base de dados {% endif %}</h4>
+        <p>{% if dadosjson %}A {{ dadosjson["DocModelo"] }} nº: {{ dadosjson["DocNumero"] }}, série {{ dadosjson["DocSerie"] }}, emitida{% endif  %}     </p>
+        <hr>
+        <p class="mb-0">Tenha acesso ao PDF da NFe. Clique no botão ao lado
+          <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+            <label class="btn btn-outline-primary" for="btnradio1">PDF</label>
+          
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+            <label class="btn btn-outline-primary" for="btnradio2">{% if dadosjson %}{{ dadosjson["DhRecbto"] }}{% endif %}</label>
+          
+            <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+            <label class="btn btn-outline-primary" for="btnradio3">XML</label>
+          </div>
+        </p>
+      </div>
+    {% endif %}
+    </div>
+
+{% endblock %}

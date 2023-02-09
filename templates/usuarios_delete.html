@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+
+{% block conteudo %}
+
+  {% set mensagens = get_flashed_messages() %}
+  {% if mensagens %}
+      <div>
+        {% for msg in mensagens %}
+          {{ msg }}
+        {% endfor%}
+      </div>
+  {% endif %}
+
+    
+
+    {% if not mensagens %}
+      Você tem certeza que deseja excluir o usuário {{usuario.nome}}?
+      <form method='post' action='/usuarios/delete/{{usuario.id}}'>
+        <input type="submit" name="excluir" value="Sim">
+      </form>
+      <a href="/usuarios/recovery">Cancelar</a>
+    {% else %}
+      Registro excluído: {{usuario.nome}} 
+    {% endif %}
+
+{% endblock %}

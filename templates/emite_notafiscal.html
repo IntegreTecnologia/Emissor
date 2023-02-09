@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+
+{% block conteudo %}
+
+  {% set mensagens = get_flashed_messages() %}
+  {% if mensagens %}
+      <div>
+        {% for msg in mensagens %}
+          {{ msg }}
+        {% endfor%}
+      </div>
+  {% endif %}
+    
+    <div class="container py-5" wi>
+    <!-- GET -->
+    <h1 class="h2">Emissão de nfe</h1>
+    {% if not mensagens %}
+      
+      
+      <form method='post' class="container-fluid justify-content-start">
+        <div class="form-floating mb-3">
+          <input type="text" name="cpfcnpjid" class="form-control" id="floatingInput" placeholder="1188">
+          <label for="floatingInput">CPF, CNPJ ou Doc. de estrangeiro</label>
+        </div>
+        <div class="row g-2">
+          <div class="col-md">
+            <div class="form-floating mb-3">
+              <input type="text" name="nomeparticipante" class="form-control" id="floatingInput" placeholder="3"><br>
+              <label for="floatingInput">Nome ou razão Social</label>
+            </div>
+          </div>
+        </div>
+        <div class="btn-group row-gap-3">
+          <button class="btn btn-primary" type="submit">Consulta destinatário</button>
+        </div>
+      </form>
+    <!-- POST -->
+    {% else %}
+      {% if mensagens[0] == 'etapa1'%}
+        <form method='post' class="container-fluid justify-content-start">
+            <div class="col-md">
+              <div class="form-floating">
+                <select name="cmbparticipante" class="form-select" id="floatingSelectGrid">
+                  <option {% if qtde > 1 %}{{ 'selected' }}{% endif %}>Selecione aqui...</option>
+                  {% for participante in result %}
+                    <option {% if qtde == 1 %}{{ 'selected' }}{% endif %} value="{{ participante[0] }}">{{ participante[1] }}</option>
+                  {% endfor %}
+                </select>
+                <label for="floatingSelectGrid">Destinatário da NFe - {{ qtde }} registro{% if qtde > 1 %}{{ 's' }}{% endif %} encontrado{% if qtde > 1 %}{{ 's' }}{% endif %}</label>
+              </div>
+            </div>
+            <div class="btn-group row-gap-3">
+              <button class="btn btn-primary" type="submit">Confirma destinatário</button>
+            </div>
+            <div class="btn-group row-gap-3">
+              <a href="/usuarios/emitenf" class="btn btn-primary">Nova consulta</a>
+            </div>
+        </form>
+      {% endif%}
+      {% if mensagens[0] == 'etapa2'%}
+        <li>{% for participante in result2 %}
+              {{ participante[3] }}
+            {% endfor %}</li>
+        <form method='post' class="container-fluid justify-content-start">
+          <div class="form-floating">
+            <select name="cmboperacaofiscal" class="form-select form-select-md mb-3" id="floatingSelect" aria-label="Floating label select example">
+              {% for operacao in result %}
+                <option {% if op == operacao[0] %}{{ 'selected' }}{% endif %} value="{{ operacao[0] }}">{{ operacao[1] }}</option>
+              {% endfor %}
+            </select>
+            <label for="floatingSelect">Operação fiscal</label>
+          </div>
+            <div class="btn-group row-gap-3">
+              <button class="btn btn-primary" type="submit">Confirma destinatário</button>
+            </div>
+            <div class="btn-group row-gap-3">
+              <a href="/usuarios/emitenf" class="btn btn-primary">Nova consulta</a>
+            </div>
+        </form>
+      {% endif%}
+      {% if mensagens[0] == 'etapa3'%}
+        <li>{{ aloha }}</li>
+      {% endif%}      
+    {% endif %}
+    </div>
+
+{% endblock %}

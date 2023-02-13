@@ -12,6 +12,7 @@ Flask-Migrate = "^4.0.4"
 Flask-SQLAlchemy = "^3.0.3"
 mysql-connector-python = "^8.0.32"
 js = "^1.0"
+Js2Py = "^0.74"
 
 [tool.poetry.dev-dependencies]
 debugpy = "^1.6.2"

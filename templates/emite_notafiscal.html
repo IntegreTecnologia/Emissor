@@ -4,29 +4,93 @@
 {% block conteudo %}
 
   {% set mensagens = get_flashed_messages() %}
-  {% if mensagens %}
-      <div>
-        {% for msg in mensagens %}
-          {{ msg }}
-        {% endfor%}
-      </div>
-  {% endif %}
-    
+    <script>
+      
+      String.prototype.reverse = function(){
+        return this.split('').reverse().join(''); 
+      };
+      
+      function mascaraMoeda(campo,evento){
+        var tecla = (!evento) ? window.event.keyCode : evento.which;
+        var valor  =  campo.value.replace(/[^\d]+/gi,'').reverse();
+        var resultado  = "";
+        var mascara = "##.###.###,##".reverse();
+        for (var x=0, y=0; x<mascara.length && y<valor.length;) {
+          if (mascara.charAt(x) != '#') {
+            resultado += mascara.charAt(x);
+            x++;
+          } else {
+            resultado += valor.charAt(y);
+            y++;
+            x++;
+          }
+        }
+        campo.value = resultado.reverse();
+      }
+      
+      function validateformpost1(qtde) {
+      
+        if (document.getElementById("selcmbparticipante").selected) {
+          liveAlertPlaceholder.innerHTML = [
+    `<div class="alert alert-danger alert-dismissible" role="alert">`,
+    `   <div>Selecione abaixo algum destinatário para a NFe!</div>`,
+    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+    '</div>'
+  ].join('')
+          return false
+        }
+        else
+        {
+          return true
+        }
+
+      }
+
+      function validateformget() {
+
+        if ((document.getElementById("cpfcnpjid").value == "") && (document.getElementById("nomeparticipante").value == "")) {
+          liveAlertPlaceholder.innerHTML = [
+    `<div class="alert alert-danger alert-dismissible" role="alert">`,
+    `   <div>Defina ao menos um critérios para a pesquisa!</div>`,
+    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+    '</div>'
+  ].join('')
+          return false
+        }
+        else
+        {
+          return true
+        }
+
+      }
+      
+      function Calcula() {
+        servqtde = document.getElementById("txtservqtde").value.replace(".","").replace(",",".")
+        servunit = document.getElementById("txtservunit").value.replace(".","").replace(",",".")
+        servqtde = servqtde*1
+        servunit = servunit*1
+        servtot = servqtde * servunit
+        document.getElementById("txtservtot").value = servtot.toFixed(2).toString().replace(".",",")
+
+        //alert(servtot)
+      }
+    </script>
     <div class="container py-5" wi>
-    <!-- GET -->
-    <h1 class="h2">Emissão de nfe</h1>
+    <!-- GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET GET -->
+    <h1 class="h2">Emissão de NFe</h1>
+    <div id="liveAlertPlaceholder"></div>
     {% if not mensagens %}
       
       
-      <form method='post' class="container-fluid justify-content-start">
+      <form method='post' class="container-fluid justify-content-start" id="formget" id="formget" required  onsubmit="return validateformget()">
         <div class="form-floating mb-3">
-          <input type="text" name="cpfcnpjid" class="form-control" id="floatingInput" placeholder="1188">
+          <input type="text" name="cpfcnpjid" class="form-control" id="cpfcnpjid" placeholder="1188">
           <label for="floatingInput">CPF, CNPJ ou Doc. de estrangeiro</label>
         </div>
         <div class="row g-2">
           <div class="col-md">
             <div class="form-floating mb-3">
-              <input type="text" name="nomeparticipante" class="form-control" id="floatingInput" placeholder="3"><br>
+              <input type="text" name="nomeparticipante" class="form-control" id="nomeparticipante" placeholder="3"><br>
               <label for="floatingInput">Nome ou razão Social</label>
             </div>
           </div>
@@ -37,12 +101,13 @@
       </form>
     <!-- POST -->
     {% else %}
+      <!-- ETAPA 1 ETAPA 1 ETAPA 1 ETAPA 1 ETAPA 1 ETAPA 1 ETAPA 1 ETAPA 1 ETAPA 1 -->
       {% if mensagens[0] == 'etapa1'%}
-        <form method='post' class="container-fluid justify-content-start">
+        <form method='post' class="container-fluid justify-content-start" onsubmit="return validateformpost1({{ qtde }})" name="formpost1" id="formpost1" required>
             <div class="col-md">
               <div class="form-floating">
                 <select name="cmbparticipante" class="form-select" id="floatingSelectGrid">
-                  <option {% if qtde > 1 %}{{ 'selected' }}{% endif %}>Selecione aqui...</option>
+                  <option id="selcmbparticipante" {% if qtde > 1 %}{{ 'selected' }}{% endif %} >Selecione aqui...</option>
                   {% for participante in result %}
                     <option {% if qtde == 1 %}{{ 'selected' }}{% endif %} value="{{ participante[0] }}">{{ participante[1] }}</option>
                   {% endfor %}
@@ -51,37 +116,174 @@
               </div>
             </div>
             <div class="btn-group row-gap-3">
-              <button class="btn btn-primary" type="submit">Confirma destinatário</button>
+              <button class="btn btn-primary" type="submit" onclick="" id="btmConfirmaDesstinatario", name="btmConfirmaDesstinatario">Confirma destinatário</button>
             </div>
             <div class="btn-group row-gap-3">
               <a href="/usuarios/emitenf" class="btn btn-primary">Nova consulta</a>
             </div>
         </form>
       {% endif%}
+      <!-- ETAPA 2 ETAPA 2 ETAPA 2 ETAPA 2 ETAPA 2 ETAPA 2 ETAPA 2 ETAPA 2 ETAPA 2 -->
       {% if mensagens[0] == 'etapa2'%}
-        <li>{% for participante in result2 %}
+        <div class="alert alert-primary" role="alert">
+          <h4 class="alert-heading">
+            {% for participante in result2 %}
               {{ participante[3] }}
-            {% endfor %}</li>
-        <form method='post' class="container-fluid justify-content-start">
+            {% endfor %}
+          </h4>
+          <hr>
+          <p class="mb-0">
+            {% for participante in result2 %}
+              {% if participante[2][2:5] == '' %}
+                {{ participante[1][:3]+'.'+ participante[1][3:6]+'.'+ participante[1][6:9]+'-'+ participante[1][9:11] }}<br>
+              {% endif%}
+              {% if participante[1][2:5] == '' %}
+                {{ participante[2][:2]+'.'+participante[2][2:5]+'.'+participante[2][5:8]+'/'+participante[2][8:12]+'-'+participante[2][12:14] }}<br>
+              {% endif%}
+              {{ participante[9] }}, 
+              {{ participante[10] }}<br>
+              {{ participante[11] }} -
+              {{ participante[22] }} /
+              {{ participante[14] }} <br> CEP: 
+              {{ participante[16] }}
+            {% endfor %}</p>
+        </div>
+        <form method='post' class="container-fluid justify-content-start" onsubmit="" id="formpost2" id="formpost2">
           <div class="form-floating">
-            <select name="cmboperacaofiscal" class="form-select form-select-md mb-3" id="floatingSelect" aria-label="Floating label select example">
+            <select name="cmboperacaofiscal" class="form-select form-select-md mb-3" id="cmboperacaofiscal" aria-label="Floating label select example">
               {% for operacao in result %}
                 <option {% if op == operacao[0] %}{{ 'selected' }}{% endif %} value="{{ operacao[0] }}">{{ operacao[1] }}</option>
               {% endfor %}
             </select>
             <label for="floatingSelect">Operação fiscal</label>
           </div>
-            <div class="btn-group row-gap-3">
-              <button class="btn btn-primary" type="submit">Confirma destinatário</button>
-            </div>
-            <div class="btn-group row-gap-3">
-              <a href="/usuarios/emitenf" class="btn btn-primary">Nova consulta</a>
-            </div>
+          {% for operacao in result %}
+            {% if op == operacao[0] %}
+              <div class="input-group">
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="iss_ali" placeholder="iss_ali" name="iss_ali" value="{{ operacao[2] }}" onKeyUp="mascaraMoeda(this, event)">
+                  <label for="floatingInput">ISS %</label>
+                </div>            
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="pis_ali" placeholder="pis_ali" name="pis_ali" value="{{ operacao[3] }}" onKeyUp="mascaraMoeda(this, event)">
+                  <label for="floatingInput">PIS %</label>
+                </div>
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="cofins_ali" placeholder="cofins_ali" name="cofins_ali" value="{{ operacao[4] }}" onKeyUp="mascaraMoeda(this, event)">
+                  <label for="floatingPassword">COFINS %</label>
+                </div>    
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="ir_ali" placeholder="ir_ali" name="ir_ali" value="{{ operacao[5] }}" onKeyUp="mascaraMoeda(this, event)">
+                  <label for="floatingInput">IR %</label>
+                </div>
+                <div class="form-floating" mb-3>
+                  <input type="text" class="form-control" id="csll_ali" placeholder="csll_ali" name="csll_ali" value="{{ operacao[6] }}" onKeyUp="mascaraMoeda(this, event)">
+                  <label for="floatingPassword">CSLL %</label>
+                </div>             
+              </div>  
+              <div class="input-group">          
+                  <div class="form-check form-switch pe-5">
+                    <input class="form-check-input" type="checkbox" role="switch" name="RadRiis"id="RadRiis" value="option1" {% if operacao[7] == '1' %}{{ 'checked' }}{% endif %}>
+                    <label class="form-check-label" for="flexSwitchCheckDefault">Retém ISS?</label>
+                  </div>
+                  <div class="form-check form-switch pe-5">
+                    <input class="form-check-input" type="checkbox" role="switch" name="RadRpis" id="RadRpis" value="option2" {% if operacao[8] == '1' %}{{ 'checked' }}{% endif %}>
+                    <label class="form-check-label" for="flexSwitchCheckDefault">Retém PIS?</label>
+                  </div>        
+                  <div class="form-check form-switch pe-5">
+                    <input class="form-check-input" type="checkbox" role="switch" name="RadRcofins" id="RadRcofins" value="option3" {% if operacao[9] == '1' %}{{ 'checked' }}{% endif %}>
+                    <label class="form-check-label" for="flexSwitchCheckDefault">Retém COFINS?</label>
+                  </div>
+                  <div class="form-check form-switch pe-5">
+                    <input class="form-check-input" type="checkbox" role="switch" name="RadRir" id="RadRir" value="option4" {% if operacao[10] == '1' %}{{ 'checked' }}{% endif %}>
+                    <label class="form-check-label" for="flexSwitchCheckDefault">Retém IR?</label>
+                  </div>       
+                  <div class="form-check form-switch pe-5">
+                    <input class="form-check-input" type="checkbox" role="switch" name="RadRcsll" id="RadRcsll" value="option5" {% if operacao[11] == '1' %}{{ 'checked' }}{% endif %}>
+                    <label class="form-check-label" for="flexSwitchCheckDefault">Retém CSLL?</label>
+                  </div>                 
+              </div>                  
+            {% endif %}
+          {% endfor %}
+          <div class="alert alert-primary" role="alert">
+            <h4 class="alert-heading">
+              Serviços prestados
+            </h4>
+          <hr>
+            <p class="mb-0">
+              <div class="input-group">
+                <div class="form-floating mb-3">
+                  <select name="cmbservico" class="form-select form-select-md mb-3" id="cmbservico" aria-label="Floating label select example">
+                  {% for servico in result3 %}
+                    <option value="{{ servico[0] }}">{{ servico[1] }}</option>
+                  {% endfor %}
+                  </select>
+                  <label for="floatingSelect">Serviço</label>
+                </div>            
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="txtservqtde" placeholder="pis_ali" name="txtservqtde" value="1" onchange="Calcula()" onKeyUp="mascaraMoeda(this, event)">
+                  <label for="floatingInput">Quantidade</label>
+                </div>
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="txtservunit" placeholder="cofins_ali" name="txtservunit" value="0,00" onchange="Calcula()" onKeyUp="mascaraMoeda(this, event)">
+                  <label for="floatingPassword">Valor Un R$</label>
+                </div>    
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="txtservtot" placeholder="ir_ali" name="txtservtot" value="0,00" disabled>
+                  <label for="floatingInput">Valor Total R$</label>
+                </div>
+              </div>    
+              <div class="form-floating mb-3">
+                  <input type="textarea" class="form-control" id="txtservobs" placeholder="ir_ali" name="txtservobs" value="">
+                  <label for="floatingInput">Obs. do serviço</label>
+              </div>
+            </p>
+        </div>
+          <div class="form-floating mb-3">
+              <textarea class="form-control" rows="3" id="txtobs" name="txtobs"></textarea>
+              <label for="floatingInput">Outras informações</label>
+          </div>
+          <div class="btn-group row-gap-3">
+            <button class="btn btn-primary" type="submit">Confirma destinatário</button>
+          </div>
+          <div class="btn-group row-gap-3">
+            <a href="/usuarios/emitenf" class="btn btn-primary">Nova consulta</a>
+          </div>
+          <div class="btn-group row-gap-3">
+            {% for participante in result2 %}
+              <input type="hidden" id="cpfParticipante" name="cpfParticipante" value="{{ participante[1] }}">
+              <input type="hidden" id="cnpjParticipante" name="cnpjParticipante" value="{{ participante[2] }}">
+              <input type="hidden" id="nomeParticipante" name="nomeParticipante" value="{{ participante[3] }}">
+            {% endfor %}
+          </div>          
         </form>
       {% endif%}
+      <!-- ETAPA 3 ETAPA 3 ETAPA 3 ETAPA 3 ETAPA 3 ETAPA 3 ETAPA 3 ETAPA 3 ETAPA 3 -->
       {% if mensagens[0] == 'etapa3'%}
         <li>{{ aloha }}</li>
-      {% endif%}      
+        <form method='post' class="container-fluid justify-content-start" onsubmit="" id="formpost3" id="formpost3">
+          <div class="btn-group row-gap-3">
+            <button class="btn btn-primary" type="submit" id="btnGeraNfe" name="btnGeraNfe">Gera NFe</button>
+          </div>
+          <div class="btn-group row-gap-3">
+            <a href="/usuarios/emitenf" class="btn btn-primary">Nova consulta</a>
+          </div>
+          <div class="btn-group row-gap-3">
+              <input type="hidden" id="numeroNfe" name="numeroNfe" value="1188">
+          </div>           
+        </form>
+      {% endif%}     
+      {% if mensagens[0] == 'etapa4'%}
+        <li>{{ aloha }} Final</li>
+        <form method='post' class="container-fluid justify-content-start" onsubmit="" id="formpost4" id="formpost4">
+          <div class="btn-group row-gap-3">
+            <button class="btn btn-primary" type="submit" id="btnEnviaNfe" name="btnEnviaNfe">Gera NFe</button>
+          </div>
+          <div class="btn-group row-gap-3">
+            <a href="/usuarios/emitenf" class="btn btn-primary">Nova consulta</a>
+          </div>
+        </form>
+      {% endif%}           
     {% endif %}
     </div>
 
